@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid'; // To generate unique userIds
+import { v4 as uuidv4 } from 'uuid'; 
 
 export type UserDocument = User & Document;
 
@@ -16,16 +16,14 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true, unique: true, default: () => uuidv4() }) // Add this to generate a unique userId
+  @Prop({ required: true, unique: true, default: () => uuidv4() }) 
   userId: string;
 
-  // Adding the method definition here
   comparePassword: (enteredPassword: string) => Promise<boolean>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-// Hash password before saving
 UserSchema.pre<UserDocument>('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
@@ -33,7 +31,6 @@ UserSchema.pre<UserDocument>('save', async function (next) {
   next();
 });
 
-// Add the comparePassword method to the schema itself
 UserSchema.methods.comparePassword = async function (enteredPassword: string): Promise<boolean> {
   return bcrypt.compare(enteredPassword, this.password);
 };
